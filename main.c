@@ -11,6 +11,9 @@ void* syscall5
 typedef unsigned long int uintptr; /* size_t */
 typedef long int intptr; /* ssize_t */
 
+#define stdout 1
+#define print(msg) write(stdout, msg, strlen(msg)) /* print to stdout w/o formatting */
+
 static intptr write(int fd, void const* data, uintptr nbytes)
 {
   return (intptr)
@@ -24,7 +27,14 @@ static intptr write(int fd, void const* data, uintptr nbytes)
    );
 }
 
+int strlen(char *str){
+  int i = 0;
+  while(*str++)
+    i++;
+  return i;
+}
+
 int main(int argc, char *argv[]){
-  write(1, "hello\n", 6);
+  print("hello\n");
   return 0;
 }
