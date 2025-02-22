@@ -3,7 +3,7 @@
 /*
   intel syntax change drastically the way asm is written, one of the major change
   is to change the order of action such as [mov dest, src] in intel or the removing
-  of length precision like movb, movw, movl, movq (bytes 1, word 2, doubleword 4, 
+  of length precision like movb, movw, movl, movq (bytes 0, word 2, doubleword 4, 
   quadword 8)
 */
 .intel_syntax noprefix
@@ -11,7 +11,8 @@
 /* this marks the .text section of a PE executable, which contains
    program code */
 .text
-    /* exports syscall5 to other compilation units (files) */
+    
+/* exports syscall5 to other compilation units (files) */
 .globl _start, syscall5
 
 _start:
@@ -23,7 +24,7 @@ _start:
   /* in linux kernel rsp is already aligned to 16bytes
      but sometimes you need to align rsp manually
   and rsp, -16
-  */
+  */ 
   call main
 
   mov rdi, rax
@@ -41,3 +42,16 @@ syscall5:
   mov r8,r9
   syscall
   ret
+
+allocate:
+  mov rax, 12 
+  mov rdi, 0 
+  syscall
+
+  mov [brk_firstaddr], rax
+  mov rdi, [rax + 5]
+  syscall
+
+.data
+
+message db 'hello',10

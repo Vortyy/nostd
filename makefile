@@ -11,8 +11,8 @@ build_good_atat:
 	clang -nostdlib -s -O2 sys.s main.c -static -Wl,-nmagic -o good_atat 
 	wc -c good_atat
 
-build_good_intel:
-	clang -nostdlib -s -O2 sys_intel.s main.c -static -Wl,-nmagic -o good_intel
+build:
+	clang -nostdlib -s -O2 sys_intel.s main.c -static -Wl,-nmagic -o good_intel -g
 	wc -c good_intel
 
 clean:

@@ -8,6 +8,9 @@ extern void* syscall5
   void* arg5
 );
 
+/* allocate 4 bytes into heap (<=> addr data segment +4 bytes ) thx to syscall brk */
+extern void* allocate();
+
 typedef unsigned long int uintptr; /* size_t */
 typedef long int intptr; /* ssize_t */
 
@@ -39,5 +42,9 @@ int main(int argc, char *argv[]){
     char *str = *++argv;
     print(str);
   }
+
+  char* brk_res = (char *) allocate();
+  print(brk_res);
+
   return 0;
 }
