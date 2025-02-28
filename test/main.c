@@ -33,6 +33,7 @@ static intptr write(int fd, void const* data, uintptr nbytes)
 
 // ---------------- mystdio.h --------------------- //
 
+#include <stdarg.h>
 #define print(msg) write(stdout, msg, strlen(msg)) /* print a cst char to stdout w/o formatting */
 
 #define NULL 0
@@ -54,6 +55,7 @@ buffer stdout_buffer = {
   .ptr = base 
 };
 
+/* _flushbuf : flush a buffer to stdout, reset buffer and if c add it at the buffer first position */
 int _flushbuf(int c, buffer *buffer){  
   int nc = buffer->ptr - buffer->base;
   if(write(stdout, buffer->base, nc) != nc)
@@ -76,12 +78,66 @@ int _flushbuf(int c, buffer *buffer){
 /* _flushout : manually flush stdout_buffer */
 #define _flushout() _flushbuf(EOF, &stdout_buffer) 
 #define putchar(x) (--stdout_buffer.cnt >= 0 ? *stdout_buffer.ptr++ = (x) : _flushbuf((x), &stdout_buffer))
+#define abs(x) ((x < 0) ? -(x) : (x))
+
+typedef union printf_var {
+  int ival;
+  float fval;
+  char cval;
+  void *pval;
+} pfv;
 
 int strlen(char *str){
   int i = 0;
   while(*str++)
     i++;
   return i;
+}
+
+void itoa(int n, char *s){
+  int sign, i;
+  sign = n;
+
+  do {
+    *s++ = abs(n % 10) + '0';
+  } while ((n /= 10) != 0);
+
+  if(sign < 0)
+    *s++ = '-';
+
+  *s = '\0';
+}
+
+void printf(const char *fmt, ...){
+  va_list ap;
+  pfv current_arg;
+  char buff[100];
+  char *p;
+  
+  va_start(ap, fmt);
+  for(; *fmt; fmt++){
+    if(*fmt != '%'){
+      putchar(*fmt);
+      continue;
+    }
+
+    switch(*++fmt){
+    case 'd': /* int case */
+      current_arg.ival = va_arg(ap, int);
+      itoa(current_arg.ival, buff);
+      int i = strlen(buff);
+      while(i-- > 0){
+        char c = *(buff + i);
+        putchar(c);
+      }
+      break;
+    default:
+      print("error: not supported format");
+    }
+  }
+
+  if(stdout_buffer.cnt != BUFSIZ)
+    _flushout();
 }
 
 // ---------------- mystdio.h --------------------- //
@@ -92,9 +148,7 @@ int main(int argc, char *argv[]){
     print(str);
   }
 
-  for(int i = 0; i < 300; i++)
-    putchar('c');
-
-  _flushout();
+  int test = -100;
+  printf("testing this printf %d\n", test);
   return 0;
 }

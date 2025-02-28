@@ -1,4 +1,6 @@
 extern main
+	
+section .note.GNU-stack noalloc noexec nowrite progbits
 
 ; cat /proc/id/maps
 section .text
@@ -10,7 +12,7 @@ _start:
   pop rdi
   mov rsi, rsp 
   call main
-
+	
   mov rdi, rax
   mov rax, 60
   syscall
@@ -82,7 +84,7 @@ mmap_alloc:
   ret
 
 
-section .bss
+section .bss 
 brk_firstpos: resq 1
   
 ;;.data section add a padding of 4096 byte aligned address ??? seem to be a page
