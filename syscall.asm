@@ -5,7 +5,7 @@ section .note.GNU-stack noalloc noexec nowrite progbits
 ; cat /proc/id/maps
 section .text
 
-global _start, syscall5, allocate
+global _start, syscall5, brk_alloc, mmap_alloc
 
 _start:
   xor rbp, rbp
@@ -26,9 +26,10 @@ syscall5:
   mov r8,r9
   syscall
   ret
-
+  
+;; for virtual addr alloc can see them on /proc/id/maps
 ;; https://gist.github.com/nikAizuddin/f4132721126257ec4345 fuck clib ??why they change brk return??
-allocate:
+brk_alloc:
   mov rax, 12 ; SYS_brk 
   mov rdi, 0
   syscall
@@ -75,6 +76,9 @@ mmap_alloc:
   mov byte [rdi + 1], 'u'
   mov byte [rdi + 2], 0
 
+  ret
+
+munmap: 
   ;; munmap --> unmap the complete pages
   mov rax, 11 ; SYS_munmap
   mov rdi, [brk_firstpos]
@@ -82,7 +86,6 @@ mmap_alloc:
   syscall
 
   ret
-
 
 section .bss 
 brk_firstpos: resq 1
